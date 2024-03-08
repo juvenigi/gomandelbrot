@@ -1,31 +1,13 @@
-package main
+package render
 
 import (
-	"image"
-	"os"
-	"path/filepath"
-
-	_ "image/jpeg"
-
 	"github.com/gopxl/pixel"
 	"github.com/gopxl/pixel/pixelgl"
 	"golang.org/x/image/colornames"
+	"path/filepath"
 )
 
-func loadPicture(path string) (pixel.Picture, error) {
-	file, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-	img, _, err := image.Decode(file)
-	if err != nil {
-		return nil, err
-	}
-	return pixel.PictureDataFromImage(img), nil
-}
-
-func run() {
+func Run() {
 	cfg := pixelgl.WindowConfig{
 		Title:  "Pixel Rocks!",
 		Bounds: pixel.R(0, 0, 1024, 768),
@@ -36,7 +18,7 @@ func run() {
 		panic(err)
 	}
 
-	abspath, _ := filepath.Abs("res/image/serrogo.jpg")
+	abspath, _ := filepath.Abs("res/image/achievement.png")
 	pic, err := loadPicture(abspath)
 	if err != nil {
 		panic(err)
@@ -50,8 +32,4 @@ func run() {
 	for !win.Closed() {
 		win.Update()
 	}
-}
-
-func main() {
-	pixelgl.Run(run)
 }
