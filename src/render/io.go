@@ -3,6 +3,8 @@ package render
 import (
 	"github.com/gopxl/pixel"
 	"image"
+	_ "image/jpeg"
+	_ "image/png"
 	"os"
 )
 

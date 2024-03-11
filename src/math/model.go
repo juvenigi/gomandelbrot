@@ -1,14 +1,7 @@
 package math
 
-import "github.com/gopxl/pixel"
-
-type Complex struct {
-	Im float64
-	Re float64
-}
-
 type IteratorCell struct {
-	Value     Complex
+	Value     MyComplex
 	Iteration uint32
 }
 
@@ -17,13 +10,19 @@ type IteratorRect struct {
 	Width uint
 }
 
-// todo implement
-func CreateIteratorRect(rect *pixel.PictureData) {
-	//height := rect.Bounds().H()
-	//width := rect.Bounds().W()
-	//rect.Pix
-}
-
-func (cell *IteratorCell) IterateUntilDone() {
-
+// CoordinateBounds is a struct that holds the bounds of the Mandelbrot set
+type CoordinateBounds struct {
+	/*
+	   +-----------+-----------+
+	   |    Second |   First   |
+	   |  Quadrant |  Quadrant |
+	   |           |           |
+	   +-----------0---(real)-->
+	   |    Third  |  Fourth   |
+	   |  Quadrant |  Quadrant |
+	   |           |           |
+	   +-----------------------+
+	*/
+	ThirdQuadrant complex128
+	FirstQuadrant complex128
 }

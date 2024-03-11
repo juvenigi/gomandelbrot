@@ -4,7 +4,7 @@ import (
 	"github.com/gopxl/pixel"
 	"github.com/gopxl/pixel/pixelgl"
 	"golang.org/x/image/colornames"
-	"path/filepath"
+	"gomandelbrot/src/math"
 )
 
 func Run() {
@@ -18,16 +18,23 @@ func Run() {
 		panic(err)
 	}
 
-	abspath, _ := filepath.Abs("res/image/achievement.png")
-	pic, err := loadPicture(abspath)
-	if err != nil {
-		panic(err)
+	//abspath, _ := filepath.Abs("res/image/achievement.png")
+	//abspath, _ := filepath.Abs("res/image/serrogo.jpg")
+	//pic, err := loadPicture(abspath)
+	//if err != nil {
+	//	panic(err)
+	//}
+
+	rect := pixel.MakePictureData(pixel.R(0, 0, 300, 300))
+
+	for i, _ := range rect.Pix {
+		rect.Pix[i] = colornames.Black
 	}
 
-	sprite := pixel.NewSprite(pic, pic.Bounds())
-
-	win.Clear(colornames.Greenyellow)
-	sprite.Draw(win, pixel.IM.Moved(win.Bounds().Center()))
+	win.Clear(colornames.White)
+	coords := pixel.R(-2, -1.5, .5, 1.5)
+	math.UpdatePictureData(rect, &coords)
+	pixel.NewSprite(rect, rect.Bounds()).Draw(win, pixel.IM.Moved(win.Bounds().Center()))
 
 	for !win.Closed() {
 		win.Update()
