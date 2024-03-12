@@ -1,26 +1,28 @@
 package math
 
 import (
+	"fmt"
 	"github.com/gopxl/pixel"
-	"image/color"
-	"math"
+	"gomandelbrot/src/render"
 	"math/cmplx"
 	_ "math/cmplx"
 	"sync"
 )
 
+type IteratorCell struct {
+	Value     MyComplex
+	Iteration uint32
+}
+
+// todo: make a smarter breakoff condition (e.g. add deadline to the function)
+var breakoff uint32 = 40000
+
+// IterateUntilDone iterates over the complex number until it's abs is greater than 2.
+// This is the core of the Mandelbrot fractal calculation.
 func (cell *IteratorCell) IterateUntilDone(c complex128) {
-	//for cmplx.Abs(cell.Value) < 2 && cell.Iteration < math.MaxUint32 {
-	//	cell.Value = cell.Value*cell.Value + c
-	//	cell.Iteration++
-	//}
-
-	//for getAbsSquared(cell.Value) < 4 && cell.Iteration < math.MaxUint32 {
-	//	cell.Value = cell.Value*cell.Value + c
-	//	cell.Iteration++
-	//}
-
-	for cell.Value.GetAbsSquared() < 4 && cell.Iteration < math.MaxUint32 {
+	for cell.Value.GetAbsSquared() < 4 && cell.Iteration < breakoff {
+		//for cmplx.Abs(complex128(cell.Value)) < 2 && cell.Iteration < math.MaxUint32 {
+		// z = z^2 + c
 		cell.Value = cell.Value*cell.Value + MyComplex(c)
 		cell.Iteration++
 	}
@@ -39,6 +41,9 @@ func UpdatePictureData(rect *pixel.PictureData, coords *pixel.Rect) {
 	shiftW := coords.Bounds().Min.X
 	shiftH := coords.Bounds().Min.Y
 
+	fmt.Println("computing the mandelbrot set with breakoff", breakoff, "(might take a while)")
+	fmt.Println("coords.Re:", coords.Min.X, coords.Max.X, "coords.Im:", coords.Min.Y, coords.Max.Y)
+	fmt.Print(pixW, " pixH: ", pixSize/pixW, "resacleReFactor: ", resacleRe, " resacleImFactor: ", resacleIm, " shiftW: ", "\n")
 	// left here so that I can use the function while debugging
 	cmplx.Abs(complex(0, 0))
 
@@ -48,19 +53,10 @@ func UpdatePictureData(rect *pixel.PictureData, coords *pixel.Rect) {
 		wg.Add(1)
 		go func(i int) {
 			defer wg.Done()
-			iterationC := complex(float64(i%pixW)*resacleRe+shiftW, float64(i/pixW)*(-resacleIm)+shiftH)
+			iterationC := complex(float64(i%pixW)*resacleRe+shiftW, float64(i/pixW)*resacleIm+shiftH)
 			cells[i].IterateUntilDone(iterationC)
-			rect.Pix[i] = obtainColor(cells[i].Iteration)
+			render.SetColor(&rect.Pix[i], cells[i].Iteration)
 		}(i)
 	}
 	wg.Wait()
-}
-
-func obtainColor(iteration uint32) color.RGBA {
-	return color.RGBA{
-		R: uint8(iteration % 255),
-		G: uint8(iteration % 255),
-		B: uint8(iteration % 255),
-		A: 255,
-	}
 }

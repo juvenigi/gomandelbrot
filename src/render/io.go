@@ -23,3 +23,5 @@ func loadPicture(path string) (pixel.Picture, error) {
 	}
 	return pixel.PictureDataFromImage(img), nil
 }
+
+//todo: implement export image function, maybe load pre-computed mandelbrot images
