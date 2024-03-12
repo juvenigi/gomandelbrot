@@ -3,7 +3,7 @@ package math
 import (
 	"fmt"
 	"github.com/gopxl/pixel"
-	"gomandelbrot/src/render"
+	"image/color"
 	"math/cmplx"
 	_ "math/cmplx"
 	"sync"
@@ -28,9 +28,9 @@ func (cell *IteratorCell) IterateUntilDone(c complex128) {
 	}
 }
 
-// UpdatePictureData calculates Mandelbrot set for each pixel in the picture data
+// CalculateIterations calculates Mandelbrot set for each pixel in the picture data
 // this is achieved by converting the address of rect.Pix to a complex number (treated as C constant)
-func UpdatePictureData(rect *pixel.PictureData, coords *pixel.Rect) {
+func CalculateIterations(rect *pixel.PictureData, coords *pixel.Rect) *[]IteratorCell {
 
 	resacleRe := coords.W() / rect.Rect.W()
 	resacleIm := coords.H() / rect.Rect.H()
@@ -55,8 +55,16 @@ func UpdatePictureData(rect *pixel.PictureData, coords *pixel.Rect) {
 			defer wg.Done()
 			iterationC := complex(float64(i%pixW)*resacleRe+shiftW, float64(i/pixW)*resacleIm+shiftH)
 			cells[i].IterateUntilDone(iterationC)
-			render.SetColor(&rect.Pix[i], cells[i].Iteration)
+			SetColor(&rect.Pix[i], cells[i].Iteration)
 		}(i)
 	}
 	wg.Wait()
+	return &cells
+}
+
+func SetColor(c *color.RGBA, iteration uint32) {
+	c.R = uint8(iteration % 255)
+	c.G = uint8(iteration % 255)
+	c.B = uint8(iteration % 255)
+	c.A = 255
 }
